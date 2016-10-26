@@ -1,21 +1,37 @@
 package net.mattiascibien.gamebackend.resources;
-import com.sun.net.httpserver.HttpServer;
-import java.io.IOException;
+import net.mattiascibien.gamebackend.dao.ScoreManagerDao;
+import net.mattiascibien.gamebackend.dao.impl.ScoreManagerInMemoryDao;
+import net.mattiascibien.gamebackend.model.Score;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
-import javax.ws.rs.Path;
+import java.util.List;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 
 // The Java class will be hosted at the URI path "/helloworld"
 @Path("/scores")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class ScoreResource {
     // The Java method will process HTTP GET requests
+    private ScoreManagerDao dao = new ScoreManagerInMemoryDao();
+
     @GET
-    // The Java method will produce content identified by the MIME Media type "text/plain"
-    @Produces("text/plain")
-    public String getClichedMessage() {
-        // Return some cliched textual content
-        return "Hello World";
+    public List getScores() {
+        return dao.featchAllScores();
+    }
+
+    @GET
+    @Path("{id}")
+    public Score getScore(@PathParam("id") int scoreId) {
+        return dao.fetchScoreById(scoreId);
+    }
+
+    @POST
+    public Response postScore(Score score) {
+        dao.insertScore(score);
+        return Response.ok().build();
     }
 }
